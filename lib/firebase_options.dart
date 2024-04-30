@@ -21,13 +21,22 @@ class DefaultFirebaseOptions {
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
-        return android;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for android - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        return macos;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for macos - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.windows:
-        return windows;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for windows - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -57,31 +66,4 @@ class DefaultFirebaseOptions {
     storageBucket: 'fl-prof-ed.appspot.com',
     iosBundleId: 'com.example.profileEditFlutter',
   );
-
-  static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyA7vrpbvGhbhWrLim1z6yLGGvJHAdciFIM',
-    appId: '1:155481698374:ios:2a3ca9c22693fd55aeda47',
-    messagingSenderId: '155481698374',
-    projectId: 'fl-prof-ed',
-    storageBucket: 'fl-prof-ed.appspot.com',
-    iosBundleId: 'com.example.profileEditFlutter',
-  );
-
-  static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCSoEyEFSIYKa7kkM17_WSbmcNphpFbNBs',
-    appId: '1:155481698374:android:c875473a01131c2eaeda47',
-    messagingSenderId: '155481698374',
-    projectId: 'fl-prof-ed',
-    storageBucket: 'fl-prof-ed.appspot.com',
-  );
-
-  static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyDlcjRCw-Vu_1hJpkTRq4VLtA7g8ZCgAg4',
-    appId: '1:155481698374:web:dce7aa1a75ffcea9aeda47',
-    messagingSenderId: '155481698374',
-    projectId: 'fl-prof-ed',
-    authDomain: 'fl-prof-ed.firebaseapp.com',
-    storageBucket: 'fl-prof-ed.appspot.com',
-  );
-
 }

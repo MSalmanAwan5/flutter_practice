@@ -1,8 +1,18 @@
+import "firebase_options.dart";
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import "./models/user_model.dart";
+import "./services/user_service.dart";
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   runApp(
     const ProviderScope(
       child: MyApp(),
@@ -30,9 +40,7 @@ final profileProvider = StateNotifierProvider<ProfileNotifier, Profile>((ref) {
 });
 
 class ProfileNotifier extends StateNotifier<Profile> {
-  ProfileNotifier()
-      : super(Profile('John Doe', 'johndoe@example.com',
-            'https://via.placeholder.com/150', false));
+  ProfileNotifier() : super(Profile('', '', '', false));
 
   void setName(String value) {
     state = state.copyWith(name: value);
@@ -42,14 +50,25 @@ class ProfileNotifier extends StateNotifier<Profile> {
     state = state.copyWith(email: value);
   }
 
+  void setImageUrl(String value) {
+    state = state.copyWith(imageUrl: value);
+  }
+
   void setIsEditing(bool value) {
     state = state.copyWith(isEditing: value);
   }
 
-  void saveChanges() {
+  void saveChanges(UserService userService) {
     // Save changes to Firebase Firestore or Realtime Database
     // For this example, we'll just print the updated values
-    print('Updated profile: ${state.name}, ${state.email}');
+    // print('Updated profile: ${state.name}, ${state.email}');
+
+    userService.updateUser(User(
+        id: "bRxW9SqhiNpP3zFaZfRg",
+        name: state.name,
+        email: state.email,
+        imageUrl: state.imageUrl));
+
     setIsEditing(false);
   }
 }
@@ -83,6 +102,28 @@ class ProfilePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profile = ref.watch(profileProvider);
+
+    final userService = ref.watch(userServiceProvider);
+
+    if (profile.name == "") {
+      // Fetch user data from Firestore
+      const userId = 'bRxW9SqhiNpP3zFaZfRg'; // Replace with the actual userId
+      userService.getUser(userId).then((user) {
+        final imgRef = FirebaseStorage.instance
+            .ref("gs://fl-prof-ed.appspot.com")
+            .child(user.imageUrl);
+        print(imgRef.fullPath);
+        // no need of the file extension, the name will do fine.
+        print('user: ${user.imageUrl}');
+        ref.read(profileProvider.notifier).setName(user.name);
+        ref.read(profileProvider.notifier).setEmail(user.email);
+        imgRef.getDownloadURL().then(
+            (value) => {ref.read(profileProvider.notifier).setImageUrl(value)});
+      });
+
+      return const Center(child: CircularProgressIndicator());
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
@@ -94,7 +135,7 @@ class ProfilePage extends ConsumerWidget {
             children: [
               CircleAvatar(
                 radius: 50,
-                backgroundImage: NetworkImage(profile.imageUrl),
+                child: Image.network(profile.imageUrl),
               ),
               const SizedBox(height: 20),
               profile.isEditing
@@ -122,7 +163,7 @@ class ProfilePage extends ConsumerWidget {
               ElevatedButton(
                 onPressed: () {
                   if (profile.isEditing) {
-                    ref.read(profileProvider.notifier).saveChanges();
+                    ref.read(profileProvider.notifier).saveChanges(userService);
                   } else {
                     ref.read(profileProvider.notifier).setIsEditing(true);
                   }
