@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "155481698374",
+    "project_id": "fl-prof-ed",
+    "storage_bucket": "fl-prof-ed.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:155481698374:android:c875473a01131c2eaeda47",
+        "android_client_info": {
+          "package_name": "com.example.profile_edit_flutter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCSoEyEFSIYKa7kkM17_WSbmcNphpFbNBs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
