@@ -105,20 +105,20 @@ class ProfilePage extends ConsumerWidget {
 
     final userService = ref.watch(userServiceProvider);
 
-    if (profile.name == "") {
+    if (profile.name == "" || profile.imageUrl == "") {
       // Fetch user data from Firestore
-      const userId = 'bRxW9SqhiNpP3zFaZfRg'; // Replace with the actual userId
+      const userId = 'bRxW9SqhiNpP3zFaZfRg';
       userService.getUser(userId).then((user) {
         final imgRef = FirebaseStorage.instance
-            .ref("gs://fl-prof-ed.appspot.com")
-            .child(user.imageUrl);
-        print(imgRef.fullPath);
+            .refFromURL('gs://fl-prof-ed.appspot.com/${user.imageUrl}');
         // no need of the file extension, the name will do fine.
-        print('user: ${user.imageUrl}');
         ref.read(profileProvider.notifier).setName(user.name);
         ref.read(profileProvider.notifier).setEmail(user.email);
-        imgRef.getDownloadURL().then(
-            (value) => {ref.read(profileProvider.notifier).setImageUrl(value)});
+        imgRef
+            .getDownloadURL()
+            .then((value) =>
+                {ref.read(profileProvider.notifier).setImageUrl(value)})
+            .catchError((error) => {print('error: $error')});
       });
 
       return const Center(child: CircularProgressIndicator());
@@ -135,7 +135,7 @@ class ProfilePage extends ConsumerWidget {
             children: [
               CircleAvatar(
                 radius: 50,
-                child: Image.network(profile.imageUrl),
+                backgroundImage: NetworkImage(profile.imageUrl),
               ),
               const SizedBox(height: 20),
               profile.isEditing
@@ -160,16 +160,30 @@ class ProfilePage extends ConsumerWidget {
                       style: const TextStyle(fontSize: 24),
                     ),
               const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  if (profile.isEditing) {
-                    ref.read(profileProvider.notifier).saveChanges(userService);
-                  } else {
-                    ref.read(profileProvider.notifier).setIsEditing(true);
-                  }
-                },
-                child: Text(profile.isEditing ? 'Save' : 'Edit'),
-              ),
+              Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                profile.isEditing
+                    ? ElevatedButton(
+                        onPressed: () {
+                          ref
+                              .read(profileProvider.notifier)
+                              .setIsEditing(!profile.isEditing);
+                        },
+                        child: const Text('Cancel'),
+                      )
+                    : Container(),
+                ElevatedButton(
+                  onPressed: () {
+                    if (profile.isEditing) {
+                      ref
+                          .read(profileProvider.notifier)
+                          .saveChanges(userService);
+                    } else {
+                      ref.read(profileProvider.notifier).setIsEditing(true);
+                    }
+                  },
+                  child: Text(profile.isEditing ? 'Save' : 'Edit'),
+                )
+              ])
             ],
           ),
         ),
