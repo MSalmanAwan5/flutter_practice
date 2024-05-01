@@ -59,10 +59,6 @@ class ProfileNotifier extends StateNotifier<Profile> {
   }
 
   void saveChanges(UserService userService) {
-    // Save changes to Firebase Firestore or Realtime Database
-    // For this example, we'll just print the updated values
-    // print('Updated profile: ${state.name}, ${state.email}');
-
     userService.updateUser(User(
         id: "bRxW9SqhiNpP3zFaZfRg",
         name: state.name,
